@@ -1,12 +1,14 @@
 import express from 'express'
 import fs from 'fs/promises'
 import { validateUser } from './midellwares/auth.js'
-import { getUsers } from './controllers/userController.js'
+import { createUsers, getUsers } from './controllers/userController.js'
 import usersRouter from './routers/usersRouter.js'
-const app = express()
-app.use(express.json())
 
+const app = express()
+
+app.use(express.json())
 app.use("/users", usersRouter)
+
 const port = 3003
 
 app.get("/", (req, res) => {
@@ -17,35 +19,9 @@ app.get("/health", (req, res) => {
     res.send({ ok: true })
 })
 
-const test = "test"
 app.get("/users", validateUser, getUsers)
+app.post("/users", validateUser, createUsers)
 
-app.post("/users", async (req, res) => {
-    try {
-        let result = await fs.readFile('./db/users.json', "utf-8")
-        let data;
-        if (!result) {
-            data = []
-        } else {
-            data = JSON.parse(result)
-        }
-        const { username, password } = req.body
-        const isTaken = data.find((user) => user.username === username)
-        if (!username || !password) {
-            res.send("invalid body")
-        } else if (isTaken) {
-            res.send("username is already taken")
-        } else {
-            const newObj = req.body
-            data.push(newObj)
-            await fs.writeFile('./db/users.json', JSON.stringify(data, null, 4))
-            res.send(data)
-        }
-    } catch (error) {
-        console.error(error.message);
-        res.send(error.message)
-    }
-})
 
 app.put('/users/:username', async (req, res) => {
     try {
@@ -58,7 +34,7 @@ app.put('/users/:username', async (req, res) => {
 
         }
     } catch (error) {
-
+        console.error(error.message);
     }
 })
 
