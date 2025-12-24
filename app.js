@@ -1,7 +1,7 @@
 import express from 'express'
 import fs from 'fs/promises'
 import { validateUser } from './midellwares/auth.js'
-import { createUsers, getUsers } from './controllers/userController.js'
+import { createUsers, editUsers, getUsers } from './controllers/userController.js'
 import usersRouter from './routers/usersRouter.js'
 
 const app = express()
@@ -21,28 +21,7 @@ app.get("/health", (req, res) => {
 
 app.get("/users", validateUser, getUsers)
 app.post("/users", validateUser, createUsers)
-
-
-app.put('/users/:username', async (req, res) => {
-    try {
-        const username = req.params.username
-        let result = await readFile('./db/users.json', 'utf-8')
-        let data;
-        if (!result) {
-            data = []
-        } else {
-
-        }
-    } catch (error) {
-        console.error(error.message);
-    }
-})
-
-
-
-
-
-
+app.put('/users/:username', validateUser, editUsers)
 
 
 
