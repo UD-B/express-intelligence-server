@@ -2,10 +2,12 @@ import express from 'express'
 import fs from 'fs/promises'
 import { validateUser } from './midellwares/auth.js'
 import { getUsers } from './controllers/userController.js'
+import usersRouter from './routers/usersRouter.js'
 const app = express()
 app.use(express.json())
-const port = 3003
 
+app.use("/users", usersRouter)
+const port = 3003
 
 app.get("/", (req, res) => {
     res.send(`server is running on port: ${port}`)
@@ -15,7 +17,7 @@ app.get("/health", (req, res) => {
     res.send({ ok: true })
 })
 
-
+const test = "test"
 app.get("/users", validateUser, getUsers)
 
 app.post("/users", async (req, res) => {
